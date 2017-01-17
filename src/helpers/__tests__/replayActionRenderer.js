@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import transit from 'transit-immutable-js';
 import replayActionRenderer from '../replayActionRenderer';
 
 jest.unmock('../replayActionRenderer');
@@ -10,7 +11,7 @@ describe('replayActionRenderer', () => {
     };
     const payload = 123;
 
-    replayActionRenderer(store);
+    replayActionRenderer(store, transit);
 
     expect(ipcRenderer.on).toHaveBeenCalledTimes(1);
     expect(ipcRenderer.on.mock.calls[0][0]).toBe('redux-action');
@@ -20,6 +21,6 @@ describe('replayActionRenderer', () => {
     cb('someEvent', payload);
 
     expect(store.dispatch).toHaveBeenCalledTimes(1);
-    expect(store.dispatch).toHaveBeenCalledWith(payload);
+    expect(store.dispatch).toHaveBeenCalledWith(transit.toJSON(payload));
   });
 });

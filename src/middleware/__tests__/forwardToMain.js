@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import transit from 'transit-immutable-js';
 import forwardToMain from '../forwardToMain';
 import validateAction from '../../helpers/validateAction';
 
@@ -15,7 +16,7 @@ describe('forwardToMain', () => {
     const action = () => {};
     validateAction.mockReturnValue(false);
 
-    forwardToMain()(next)(action);
+    forwardToMain(transit)()(next)(action);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(action);
@@ -25,7 +26,7 @@ describe('forwardToMain', () => {
     const next = jest.fn();
     const action = { type: '@@SOMETHING' };
 
-    forwardToMain()(next)(action);
+    forwardToMain(transit)()(next)(action);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(action);
@@ -35,7 +36,7 @@ describe('forwardToMain', () => {
     const next = jest.fn();
     const action = { type: 'redux-form' };
 
-    forwardToMain()(next)(action);
+    forwardToMain(transit)()(next)(action);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(action);
@@ -50,7 +51,7 @@ describe('forwardToMain', () => {
       },
     };
 
-    forwardToMain()(next)(action);
+    forwardToMain(transit)()(next)(action);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(action);
@@ -65,10 +66,10 @@ describe('forwardToMain', () => {
       },
     };
 
-    forwardToMain()(next)(action);
+    forwardToMain(transit)()(next)(action);
 
     expect(ipcRenderer.send).toHaveBeenCalledTimes(1);
-    expect(ipcRenderer.send).toHaveBeenCalledWith('redux-action', action);
+    expect(ipcRenderer.send).toHaveBeenCalledWith('redux-action', transit.toJSON(action));
 
     expect(next).toHaveBeenCalledTimes(0);
   });

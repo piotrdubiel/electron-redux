@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 import validateAction from '../helpers/validateAction';
 
-const forwardToMain = store => next => (action) => { // eslint-disable-line no-unused-vars
+const forwardToMain = transit => () => next => (action) => {
   if (!validateAction(action)) return next(action);
 
   if (
@@ -13,7 +13,7 @@ const forwardToMain = store => next => (action) => { // eslint-disable-line no-u
       || action.meta.scope !== 'local'
     )
   ) {
-    ipcRenderer.send('redux-action', action);
+    ipcRenderer.send('redux-action', transit.toJSON(action));
 
     // stop action in-flight
     // eslint-disable-next-line consistent-return

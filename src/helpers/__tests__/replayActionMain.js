@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import transit from 'transit-immutable-js';
 import replayActionMain from '../replayActionMain';
 
 jest.unmock('../replayActionMain');
@@ -12,7 +13,7 @@ describe('replayActionMain', () => {
     };
     const payload = 123;
 
-    replayActionMain(store);
+    replayActionMain(store, transit);
 
     expect(ipcMain.on).toHaveBeenCalledTimes(1);
     expect(ipcMain.on.mock.calls[0][0]).toBe('redux-action');
@@ -22,7 +23,7 @@ describe('replayActionMain', () => {
     cb('someEvent', payload);
 
     expect(store.dispatch).toHaveBeenCalledTimes(1);
-    expect(store.dispatch).toHaveBeenCalledWith(payload);
+    expect(store.dispatch).toHaveBeenCalledWith(transit.toJSON(payload));
   });
 
   it('should subscribe to the store and update the global state', () => {
@@ -34,9 +35,9 @@ describe('replayActionMain', () => {
       subscribe: jest.fn(),
     };
 
-    replayActionMain(store);
+    replayActionMain(store, transit);
 
-    expect(global.reduxState).toEqual(initialState);
+    expect(global.reduxState).toEqual(transit.toJSON(initialState));
     expect(store.subscribe).toHaveBeenCalledTimes(1);
     expect(store.subscribe.mock.calls[0][0]).toBeInstanceOf((Function));
 
@@ -44,6 +45,6 @@ describe('replayActionMain', () => {
     store.getState = jest.fn(() => newState);
     subscribeCb();
 
-    expect(global.reduxState).toEqual(newState);
+    expect(global.reduxState).toEqual(transit.toJSON(newState));
   });
 });

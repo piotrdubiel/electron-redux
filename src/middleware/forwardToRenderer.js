@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron';
 import validateAction from '../helpers/validateAction';
 
-const forwardToRenderer = () => next => (action) => {
+const forwardToRenderer = transit => () => next => (action) => {
   if (!validateAction(action)) return next(action);
 
   // change scope to avoid endless-loop
@@ -15,7 +15,7 @@ const forwardToRenderer = () => next => (action) => {
 
   const openWindows = BrowserWindow.getAllWindows();
   openWindows.forEach(({ webContents }) => {
-    webContents.send('redux-action', rendererAction);
+    webContents.send('redux-action', transit.toJSON(rendererAction));
   });
 
   return next(action);
