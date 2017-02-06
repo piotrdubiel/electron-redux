@@ -20,6 +20,10 @@ var forwardToRenderer = function forwardToRenderer(transit) {
       return function (action) {
         if (!(0, _validateAction2.default)(action)) return next(action);
 
+        if (action.meta && action.meta.scope && action.meta.scope === 'local') {
+          return next(action);
+        }
+
         // change scope to avoid endless-loop
         var rendererAction = _extends({}, action, {
           meta: _extends({}, action.meta, {
